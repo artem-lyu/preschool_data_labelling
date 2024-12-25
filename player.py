@@ -8,7 +8,7 @@ from labels import LabelSidebar
 class VideoPlayer(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Video Labeler with Undo/Confirm")
+        self.setWindowTitle("CDL Image Labelling")
 
         # Media
         self.mediaPlayer = QMediaPlayer()
@@ -22,6 +22,7 @@ class VideoPlayer(QWidget):
 
         # label sidebar
         self.labelSidebar = LabelSidebar()
+        self.labelSidebar.labelList.currentItemChanged.connect(self.on_label_selected)
 
         # video label
         self.videoLabel = VideoLabel()
@@ -98,3 +99,7 @@ class VideoPlayer(QWidget):
     def confirm_boxes(self):
         label = self.labelSidebar.get_selected_label()
         self.videoLabel.confirm_bounding_boxes(self.outputDir, label)
+
+    def on_label_selected(self):
+        selectedLabel = self.labelSidebar.get_selected_label()
+        self.videoLabel.setCurrentLabel(selectedLabel)

@@ -14,6 +14,10 @@ class VideoLabel(QLabel):
         self.isDrawing = False
         self.startPoint = QPoint()
         self.endPoint = QPoint()
+        self.currentLabel = ""
+
+    def setCurrentLabel(self, label: str):
+        self.currentLabel = label or ""
 
     def setVideoFrame(self, frame):
         if not frame.isValid():
@@ -40,24 +44,35 @@ class VideoLabel(QLabel):
             self.isDrawing = False
             rect = QRect(self.startPoint, self.endPoint).normalized()
             if not rect.isNull():
-                self.boundingBoxes.append(rect)
+                self.boundingBoxes.append((rect, self.currentLabel))
             self.update()
 
     def paintEvent(self, event):
         super().paintEvent(event)
         painter = QPainter(self)
 
+    
         if not self.currentFrame.isNull():
             painter.drawPixmap(0, 0, self.width(), self.height(), self.currentFrame)
 
-        # stored bounding boxes
-        pen = QPen(QColor(255, 0, 0), 3)
+        pen = QPen(QColor(255, 0, 0), 3)  # red bounding box
         painter.setPen(pen)
-        for box in self.boundingBoxes:
-            painter.drawRect(box)
 
-        # live rectangle
+        for (rect, label) in self.boundingBoxes:
+            painter.drawRect(rect)
+
+            # label text
+            painter.setPen(QColor(255, 0, 0)) 
+            painter.drawText(
+                rect.x() + 2,
+                rect.y() + 16,
+                label
+            )
+
+            painter.setPen(pen)
+
         if self.isDrawing:
+            painter.setPen(QColor(255, 0, 0))
             liveRect = QRect(self.startPoint, self.endPoint).normalized()
             painter.drawRect(liveRect)
 

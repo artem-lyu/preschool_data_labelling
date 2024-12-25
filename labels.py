@@ -22,3 +22,4 @@ class LabelSidebar(QWidget):
     def get_selected_label(self):
         item = self.labelList.currentItem()
         return item.text() if item else None
+
