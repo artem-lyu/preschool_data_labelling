@@ -15,6 +15,11 @@ class VideoLabel(QLabel):
         self.startPoint = QPoint()
         self.endPoint = QPoint()
         self.currentLabel = ""
+        self.labelingEnabled = False
+
+
+    def enableLabeling(self, enabled: bool):
+        self.labelingEnabled = enabled
 
     def setCurrentLabel(self, label: str):
         self.currentLabel = label or ""
@@ -28,6 +33,9 @@ class VideoLabel(QLabel):
             self.update()
 
     def mousePressEvent(self, event):
+        if not self.labelingEnabled:
+            return
+
         if event.button() == Qt.MouseButton.LeftButton:
             self.isDrawing = True
             self.startPoint = event.pos()
