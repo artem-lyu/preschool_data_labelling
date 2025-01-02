@@ -92,9 +92,6 @@ class VideoLabel(QLabel):
             self.update()
 
     def confirm_bounding_boxes(self, outputDir, selectedLabel):
-        if not selectedLabel:
-            print("No label selected!")
-            return
         if not outputDir:
             print("No output directory set!")
             return
@@ -105,21 +102,26 @@ class VideoLabel(QLabel):
         scale_x = self.currentFrame.width() / self.width()
         scale_y = self.currentFrame.height() / self.height()
 
-        for rect in self.boundingBoxes:
-            x = int(rect.x() * scale_x)
-            y = int(rect.y() * scale_y)
-            w = int(rect.width() * scale_x)
-            h = int(rect.height() * scale_y)
+        for (boxRect, storedLabel) in self.boundingBoxes:
+            # If the bounding box is missing a label, skip or handle gracefully
+            if not storedLabel:
+                print("A bounding box had no label! Skipping.")
+                continue
+
+            x = int(boxRect.x() * scale_x)
+            y = int(boxRect.y() * scale_y)
+            w = int(boxRect.width() * scale_x)
+            h = int(boxRect.height() * scale_y)
             rImg = QRect(x, y, w, h)
             cropped = self.currentFrame.copy(rImg)
 
-            labelPath = os.path.join(outputDir, selectedLabel)
+            labelPath = os.path.join(outputDir, storedLabel)
             os.makedirs(labelPath, exist_ok=True)
             filename = f"{uuid.uuid4().hex}.png"
             fullPath = os.path.join(labelPath, filename)
             cropped.save(fullPath)
             print("Saved:", fullPath)
 
-        # clear bounding boxes
+        # Clear bounding boxes if desired
         self.boundingBoxes.clear()
         self.update()
