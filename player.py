@@ -60,6 +60,8 @@ class VideoPlayer(QWidget):
         self.chooseDirButton = QPushButton("Choose Output Dir")
         self.chooseDirButton.clicked.connect(self.choose_output_directory)
 
+        self.labelSidebar.labelDeleted.connect(self.handle_label_deleted)
+
         
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(self.openButton)
@@ -170,6 +172,17 @@ class VideoPlayer(QWidget):
             return f"{hours}:{minutes:02}:{seconds:02}"
         else:
             return f"{minutes}:{seconds:02}"
+        
+    def handle_label_deleted(self, labelName):
+        if not self.outputDir:
+            return
+        import shutil, os
+
+        folderPath = os.path.join(self.outputDir, labelName)
+        if os.path.isdir(folderPath):
+            # delete the folder and all its contents
+            shutil.rmtree(folderPath)
+            print(f"Deleted folder: {folderPath}")
         
 
     # focus window for keybindings    
